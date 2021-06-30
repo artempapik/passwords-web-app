@@ -20,7 +20,7 @@ const getElements = async () => {
         td1.textContent = site
 
         const td2 = document.createElement('td')
-        td2.textContent = '***'
+        td2.textContent = HIDDEN_PASSWORD
 
         const showPasswordButton = document.createElement('button')
         showPasswordButton.style = 'float: right'
@@ -50,17 +50,32 @@ const clearTable = () => {
 }
 
 const createPassword = async () => {
-    await fetch(`${DEST_URL}/create-password`, {
+    const [site, password] = [getTextBoxValue('site'), getTextBoxValue('password')]
+
+    if (!site || !password) {
+        alert(`Enter 'site' and 'password' values`)
+        return
+    }
+
+    const printUploadNotSuccess = () => alert('Uploading new password was not successful')
+
+    const result = await fetch(`${DEST_URL}/create-password`, {
         method: 'post',
         headers: DEFAULT_POST_HEADERS,
         body: JSON.stringify({
-            site: document.querySelector('#site').value,
-            password: document.querySelector('#password').value
+            site,
+            password
         })
-    })
+    }).catch(_ => printUploadNotSuccess())
+
+    if (!result.ok) {
+        printUploadNotSuccess()
+    }
 
     await getElements()
 }
+
+const getTextBoxValue = textBoxId => document.querySelector(`#${textBoxId}`).value
 
 window.onload = async () => await getElements()
 
