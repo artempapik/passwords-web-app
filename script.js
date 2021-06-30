@@ -68,8 +68,14 @@ const createPassword = async () => {
         })
     }).catch(_ => printUploadNotSuccess())
 
+    if (result.status === 500) {
+        alert(`Password for this site already exists.\nPlease use 'change password' button`)
+        return
+    }
+
     if (!result.ok) {
         printUploadNotSuccess()
+        return
     }
 
     await getElements()
