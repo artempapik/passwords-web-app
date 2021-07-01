@@ -5,7 +5,7 @@ const DEFAULT_POST_HEADERS = {
     'Content-Type': 'application/json'
 }
 
-const getElements = async () => {
+const getPasswords = async () => {
     clearTable()
 
     const response = await fetch(`${DEST_URL}/get-passwords`)
@@ -49,7 +49,9 @@ const clearTable = () => {
     tbody.innerHTML = ''
 }
 
-const createPassword = async () => {
+const getTextBoxValue = textBoxId => document.querySelector(`#${textBoxId}`).value
+
+const addNewPassword = async () => {
     const [site, password] = [getTextBoxValue('site'), getTextBoxValue('password')]
 
     if (!site || !password) {
@@ -78,11 +80,10 @@ const createPassword = async () => {
         return
     }
 
-    await getElements()
+    await getPasswords()
 }
 
-const getTextBoxValue = textBoxId => document.querySelector(`#${textBoxId}`).value
-
-window.onload = async () => await getElements()
-
-document.querySelector('#add-new-password').onclick = async () => await createPassword()
+const showAddPasswordArea = () => {
+    const area = document.querySelector('#add-password-area')
+    area.hidden = !area.hidden
+}
