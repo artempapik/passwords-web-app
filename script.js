@@ -1,10 +1,5 @@
 const DEST_URL = 'http://localhost:3000'
 const HIDDEN_PASSWORD = '***'
-
-const DEFAULT_POST_HEADERS = {
-    'Content-Type': 'application/json'
-}
-
 const INTERNAL_SERVER_ERROR = 500
 
 const getPasswords = async () => {
@@ -50,6 +45,14 @@ const clearPasswordsTable = () => document.querySelector('#my-table').innerHTML 
 
 const getTextBoxValue = textBoxId => document.querySelector(`#${textBoxId}`).value
 
+const doPostRequest = async (url, object) => await fetch(url, {
+    method: 'post',
+    headers: {
+        'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(object)
+})
+
 const addNewPassword = async () => {
     const [site, password] = [getTextBoxValue('site'), getTextBoxValue('password')]
 
@@ -58,16 +61,12 @@ const addNewPassword = async () => {
         return
     }
 
-    const printUploadNotSuccess = () => showModal('errorModal', 'Uploading new password was not successful.')
+    const showUploadNotSuccess = () => showModal('errorModal', 'Uploading new password was not successful.')
 
-    const result = await fetch(`${DEST_URL}/create-password`, {
-        method: 'post',
-        headers: DEFAULT_POST_HEADERS,
-        body: JSON.stringify({
-            site,
-            password
-        })
-    }).catch(_ => printUploadNotSuccess())
+    const result = await doPostRequest(`${DEST_URL}/create-password`, {
+        site,
+        password
+    }).catch(_ => showUploadNotSuccess())
 
     if (result.status === INTERNAL_SERVER_ERROR) {
         showModal('errorModal', `Password for this site already exists.\nPlease use 'change password' button.`)
