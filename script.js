@@ -5,8 +5,10 @@ const DEFAULT_POST_HEADERS = {
     'Content-Type': 'application/json'
 }
 
+const INTERNAL_SERVER_ERROR = 500
+
 const getPasswords = async () => {
-    clearTable()
+    clearPasswordsTable()
 
     const response = await fetch(`${DEST_URL}/get-passwords`)
     const passwords = await response.json()
@@ -44,10 +46,7 @@ const getPasswords = async () => {
     }
 }
 
-const clearTable = () => {
-    const tbody = document.querySelector('#my-table')
-    tbody.innerHTML = ''
-}
+const clearPasswordsTable = () => document.querySelector('#my-table').innerHTML = ''
 
 const getTextBoxValue = textBoxId => document.querySelector(`#${textBoxId}`).value
 
@@ -55,11 +54,11 @@ const addNewPassword = async () => {
     const [site, password] = [getTextBoxValue('site'), getTextBoxValue('password')]
 
     if (!site || !password) {
-        alert(`Enter 'site' and 'password' values`)
+        showModal('errorModal', `Enter 'site' and 'password' values`)
         return
     }
 
-    const printUploadNotSuccess = () => alert('Uploading new password was not successful')
+    const printUploadNotSuccess = () => showModal('errorModal', 'Uploading new password was not successful.')
 
     const result = await fetch(`${DEST_URL}/create-password`, {
         method: 'post',
@@ -70,8 +69,8 @@ const addNewPassword = async () => {
         })
     }).catch(_ => printUploadNotSuccess())
 
-    if (result.status === 500) {
-        alert(`Password for this site already exists.\nPlease use 'change password' button`)
+    if (result.status === INTERNAL_SERVER_ERROR) {
+        showModal('errorModal', `Password for this site already exists.\nPlease use 'change password' button.`)
         return
     }
 
@@ -86,4 +85,18 @@ const addNewPassword = async () => {
 const showAddPasswordArea = () => {
     const area = document.querySelector('#add-password-area')
     area.hidden = !area.hidden
+}
+
+const showModal = (modalId, text) => {
+    const modal = new bootstrap.Modal(document.querySelector(`#${modalId}`))
+    const modalBody = document.querySelector('.modal-body')
+    modalBody.innerHTML = ''
+
+    for (const value of text.split('\n')) {
+        const modalDiv = document.createElement('div')
+        modalDiv.textContent = value
+        modalBody.appendChild(modalDiv)
+    }
+
+    modal.show()
 }

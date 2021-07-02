@@ -5,6 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+    <link href="modal-style.css" />
     <style>
         .site-name {
             font-size: 20px;
@@ -38,7 +39,7 @@
         <div class="row">
             <div class="col-md-5"></div>
             <div class="col-md-2">
-                <button type="button" class="btn btn-outline-secondary add-password-button" onclick="showAddPasswordArea()">
+                <button class="btn btn-outline-secondary add-password-button" onclick="showAddPasswordArea()">
                     Add new password
                 </button>
             </div>
@@ -67,7 +68,7 @@
                     <input id="password" type="password" class="form-control" />
                 </div>
                 
-                <button type="button" class="btn btn-primary add-button" onclick="addNewPassword()">
+                <button class="btn btn-primary add-button" onclick="addNewPassword()">
                     Add
                 </button>
             </div>
@@ -99,6 +100,37 @@
         </div>
     </div>
 
+    <div
+        class="modal fade"
+        id="errorModal"
+        data-bs-backdrop="static"
+        data-bs-keyboard="false"
+        tabindex="-1"
+        aria-labelledby="staticBackdropLabel"
+        aria-hidden="true">
+
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="staticBackdropLabel">
+                        Error
+                    </h5>
+                    <button
+                        type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Close">
+                    </button>
+                </div>
+                <div class="modal-body"></div>
+            </div>
+        </div>
+    </div>
+
+    <script
+        src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+        crossorigin="anonymous">
+    </script>
     <script src="script.js"></script>
 </body>
 </html>
