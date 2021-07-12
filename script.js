@@ -2,13 +2,25 @@ const DEST_URL = 'http://localhost:3000'
 const HIDDEN_PASSWORD = '***'
 const INTERNAL_SERVER_ERROR = 500
 
+const clearPasswordsTable = () => document.querySelector('#passwords-table').innerHTML = ''
+
+const getTextBoxValue = textBoxId => document.querySelector(`#${textBoxId}`).value
+
+const doPostRequest = async (url, object) => await fetch(url, {
+    method: 'post',
+    headers: {
+        'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(object)
+})
+
 const getPasswords = async () => {
     clearPasswordsTable()
 
     const response = await fetch(`${DEST_URL}/get-passwords`)
     const passwords = await response.json()
 
-    const tbody = document.querySelector('#my-table')
+    const tbody = document.querySelector('#passwords-table')
 
     for (const site in passwords) {
         const tr = document.createElement('tr')
@@ -41,61 +53,57 @@ const getPasswords = async () => {
     }
 }
 
-const clearPasswordsTable = () => document.querySelector('#my-table').innerHTML = ''
-
-const getTextBoxValue = textBoxId => document.querySelector(`#${textBoxId}`).value
-
-const doPostRequest = async (url, object) => await fetch(url, {
-    method: 'post',
-    headers: {
-        'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(object)
-})
-
 const addNewPassword = async () => {
     const [site, password] = [getTextBoxValue('site'), getTextBoxValue('password')]
 
     if (!site || !password) {
-        showModal('errorModal', `Enter 'site' and 'password' values`)
+        showErrorModal(`Enter 'site' and 'password' values`)
         return
     }
-
-    const showUploadNotSuccess = () => showModal('errorModal', 'Uploading new password was not successful.')
 
     const result = await doPostRequest(`${DEST_URL}/create-password`, {
         site,
         password
-    }).catch(_ => showUploadNotSuccess())
+    }).catch(_ => showErrorModal('errorModal', 'Uploading new password was not successful'))
 
     if (result.status === INTERNAL_SERVER_ERROR) {
-        showModal('errorModal', `Password for this site already exists.\nPlease use 'change password' button.`)
+        showErrorModal(`Password for this site already exists.\nPlease use 'change password' button`)
         return
     }
 
     if (!result.ok) {
-        printUploadNotSuccess()
+        showErrorModal('Request was not successfull')
         return
     }
 
+    const addChangePasswordModal = document.querySelector(`#add-change-password-modal`)
+    console.log(addChangePasswordModal)
+    const closeButton = addChangePasswordModal.querySelector('.btn-close')
+    closeButton.click()
+    
     await getPasswords()
 }
 
-const showAddPasswordArea = () => {
-    const area = document.querySelector('#add-password-area')
-    area.hidden = !area.hidden
-}
-
-const showModal = (modalId, text) => {
-    const modal = new bootstrap.Modal(document.querySelector(`#${modalId}`))
-    const modalBody = document.querySelector('.modal-body')
+const showErrorModal = modalText => {
+    const modal = document.querySelector('#error-modal')
+    const errorModal = new bootstrap.Modal(modal)
+    const modalBody = errorModal.querySelector('.modal-body')
     modalBody.innerHTML = ''
 
-    for (const value of text.split('\n')) {
+    for (const value of modalText.split('\n')) {
         const modalDiv = document.createElement('div')
         modalDiv.textContent = value
         modalBody.appendChild(modalDiv)
     }
 
-    modal.show()
+    errorModal.show()
+}
+
+const showAddChangePasswordModal = headerTitle => {
+    const modal = document.querySelector('#add-change-password-modal')
+    const addChangePasswordModal = new bootstrap.Modal(modal)
+    const modalHeader = modal.querySelector('.modal-title')
+    modalHeader.textContent = headerTitle
+
+    addChangePasswordModal.show()
 }
